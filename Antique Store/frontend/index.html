@@ -1,18 +1,119 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Relic & Rule — Antique Curios</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Relic &amp; Rule — Antique Catalog</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand sticky-top">
+  <div class="container">
+    <span class="navbar-brand">Relic <em>&amp;</em> Rule</span>
+    <ul class="nav nav-tabs-custom ms-auto" id="viewTabs">
+      <li><button class="tab-link active" data-view="shop">Catalog</button></li>
+      <li><button class="tab-link" data-view="manage">Manage Collection</button></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow">Est. collection, hand-verified</p>
+        <h1>Objects that <em>outlived</em> their century.</h1>
+        <p class="hero-sub">A small, hand-checked catalog of antique furniture, timepieces and curios — each piece numbered and described exactly as found.</p>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-count" id="heroCount">—</span>
+        <span class="hero-count-label">pieces in the collection</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container py-5">
+
+  <section id="shopView">
+    <div class="filter-row">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search the catalog...">
+      <div class="chip-row" id="categoryChips"></div>
+    </div>
+    <div id="shopStatus" class="shop-status d-none"></div>
+    <div class="row g-4" id="productGrid"></div>
+  </section>
+
+  <section id="manageView" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <h2 class="section-title mb-0">Manage the Collection</h2>
+      <button class="btn-rule" data-bs-toggle="modal" data-bs-target="#productModal" onclick="openCreateForm()">+ Add a piece</button>
+    </div>
+    <div class="table-responsive catalog-table-wrap">
+      <table class="table catalog-table align-middle mb-0">
+        <thead><tr><th></th><th>Name</th><th>Category</th><th>Era</th><th>Price</th><th>Stock</th><th></th></tr></thead>
+        <tbody id="manageBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">Relic &amp; Rule — a small antiques catalog, built for demonstration.</div>
+</footer>
+
+<!-- Product detail modal (view-only, click a card) -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content detail-modal">
+      <div class="modal-header border-0">
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Create/Edit modal -->
+<div class="modal fade" id="productModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">Add a piece</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="productForm">
+          <input type="hidden" id="productId">
+          <div class="mb-2"><label class="form-label">Name</label><input class="form-control" id="fName" required></div>
+          <div class="row">
+            <div class="col mb-2"><label class="form-label">Category</label><input class="form-control" id="fCategory" required></div>
+            <div class="col mb-2"><label class="form-label">Era</label><input class="form-control" id="fEra" placeholder="Circa 1900"></div>
+          </div>
+          <div class="row">
+            <div class="col mb-2"><label class="form-label">Price ($)</label><input type="number" min="0" class="form-control" id="fPrice" required></div>
+            <div class="col mb-2"><label class="form-label">Stock</label><input type="number" min="0" class="form-control" id="fStock"></div>
+          </div>
+          <div class="mb-2"><label class="form-label">Image URL</label><input class="form-control" id="fImage"></div>
+          <div class="mb-2"><label class="form-label">Description</label><textarea class="form-control" id="fDescription" rows="3"></textarea></div>
+          <div id="formError" class="text-danger small"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn-rule" onclick="saveProduct()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="app-toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/app.js"></script>
+</body>
 </html>
